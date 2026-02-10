@@ -11,27 +11,34 @@ import Prosent from './pages/Prosent';
 import Ukenummer from './pages/Ukenummer';
 import Valuta from './pages/Valuta';
 
+import { LanguageProvider } from './context/LanguageContext';
+import { ThemeProvider } from './context/ThemeContext';
+
 function App() {
   return (
-    <Router>
-      <div className="flex flex-col min-h-screen">
-        <Navbar />
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/toll" element={<TollCalculator />} />
-            <Route path="/json-csv" element={<JsonConverter />} />
-            <Route path="/excel-ai" element={<ExcelGenerator />} />
-            <Route path="/strom" element={<Stromstotte />} />
-            <Route path="/bilavgift" element={<Bilavgift />} />
-            <Route path="/prosent" element={<Prosent />} />
-            <Route path="/uke" element={<Ukenummer />} />
-            <Route path="/valuta" element={<Valuta />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+    <LanguageProvider>
+      <ThemeProvider>
+        <Router>
+          <div className="flex flex-col min-h-screen bg-nordic-light dark:bg-nordic-dark text-nordic-lightText dark:text-nordic-text transition-colors duration-300">
+            <Navbar />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/toll" element={<TollCalculator />} />
+                <Route path="/json-csv" element={<JsonConverter />} />
+                <Route path="/excel-ai" element={<ExcelGenerator />} />
+                <Route path="/strom" element={<Stromstotte />} />
+                <Route path="/bilavgift" element={<Bilavgift />} />
+                <Route path="/prosent" element={<Prosent />} />
+                <Route path="/uke" element={<Ukenummer />} />
+                <Route path="/valuta" element={<Valuta />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </Router>
+      </ThemeProvider>
+    </LanguageProvider>
   );
 }
 

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Sparkles, Copy, Check, Loader2 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 const ExcelGenerator = () => {
+    const { t } = useLanguage();
     const [prompt, setPrompt] = useState('');
     const [result, setResult] = useState('');
     const [loading, setLoading] = useState(false);
@@ -42,21 +44,21 @@ const ExcelGenerator = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-700 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-green-900/20 mb-4">
                     <Sparkles className="text-white w-8 h-8" />
                 </div>
-                <h1 className="text-3xl font-bold text-white mb-2">Excel AI Assistant</h1>
-                <p className="text-slate-400">Describe what you want to calculate, and I'll write the formula for you.</p>
+                <h1 className="text-3xl font-bold text-white mb-2">{t('excelCalc.title')}</h1>
+                <p className="text-slate-400">{t('excelCalc.subtitle')}</p>
             </div>
 
-            <div className="bg-nordic-card border border-slate-700/50 rounded-2xl p-6 shadow-xl space-y-6 relative overflow-hidden">
+            <div className="bg-nordic-card dark:bg-slate-900 border border-slate-700/50 rounded-2xl p-6 shadow-xl space-y-6 relative overflow-hidden">
                 {/* Background glow effect */}
                 <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-green-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div className="space-y-2 relative">
-                    <label className="text-sm font-semibold text-slate-300 ml-1">Your Request</label>
+                    <label className="text-sm font-semibold text-slate-300 ml-1">{t('excelCalc.label')}</label>
                     <textarea
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         className="w-full h-32 bg-slate-800/50 text-white rounded-xl border border-slate-700 p-4 focus:ring-2 focus:ring-green-500/50 focus:border-green-500/50 outline-none transition-all resize-none placeholder-slate-500"
-                        placeholder="e.g. Sum column A if column B says 'Approved', otherwise leave blank..."
+                        placeholder={t('excelCalc.placeholder')}
                     />
                 </div>
 
@@ -68,12 +70,12 @@ const ExcelGenerator = () => {
                     {loading ? (
                         <>
                             <Loader2 className="animate-spin" size={20} />
-                            Generating Magic...
+                            {t('excelCalc.loading')}
                         </>
                     ) : (
                         <>
                             <Sparkles size={20} />
-                            Generate Formula
+                            {t('excelCalc.button')}
                         </>
                     )}
                 </button>
@@ -89,7 +91,7 @@ const ExcelGenerator = () => {
                             {copied ? <Check size={20} className="text-green-500" /> : <Copy size={20} />}
                         </button>
 
-                        {copied && <span className="absolute -top-8 right-2 text-xs bg-green-500 text-white px-2 py-1 rounded shadow-lg animate-fade-out-up">Copied!</span>}
+                        {copied && <span className="absolute -top-8 right-2 text-xs bg-green-500 text-white px-2 py-1 rounded shadow-lg animate-fade-out-up">{t('excelCalc.copied')}</span>}
                     </div>
                 </div>
             </div>

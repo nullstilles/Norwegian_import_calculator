@@ -1,39 +1,45 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutGrid, Calculator, FileJson, Table2, Menu, X, Zap, Car, Percent, CalendarDays, Banknote } from 'lucide-react';
+import LanguageSwitcher from './LanguageSwitcher';
+import ThemeToggler from './ThemeToggler';
+import { useLanguage } from '../context/LanguageContext';
 
 const Navbar = () => {
     const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
+    const { t } = useLanguage();
 
     const isActive = (path) => {
-        return location.pathname === path ? 'text-nordic-accent bg-blue-500/10' : 'text-slate-400 hover:text-nordic-text hover:bg-slate-800';
+        return location.pathname === path
+            ? 'text-nordic-accent bg-blue-500/10 dark:bg-blue-500/20'
+            : 'text-slate-600 dark:text-slate-400 hover:text-nordic-lightText dark:hover:text-nordic-text hover:bg-slate-100 dark:hover:bg-slate-800';
     };
 
     const navItems = [
-        { name: 'Hjem', path: '/', icon: <LayoutGrid size={18} /> },
-        { name: 'Toll', path: '/toll', icon: <Calculator size={18} /> },
-        { name: 'Strøm', path: '/strom', icon: <Zap size={18} /> },
-        { name: 'Bil', path: '/bilavgift', icon: <Car size={18} /> },
-        { name: 'Valuta', path: '/valuta', icon: <Banknote size={18} /> },
-        { name: 'Uke', path: '/uke', icon: <CalendarDays size={18} /> },
-        { name: 'Prosent', path: '/prosent', icon: <Percent size={18} /> },
+        { name: t('nav.home'), path: '/', icon: <LayoutGrid size={18} /> },
+        { name: t('nav.toll'), path: '/toll', icon: <Calculator size={18} /> },
+        { name: t('nav.strom'), path: '/strom', icon: <Zap size={18} /> },
+        { name: t('nav.bil'), path: '/bilavgift', icon: <Car size={18} /> },
+        { name: t('nav.valuta'), path: '/valuta', icon: <Banknote size={18} /> },
+        { name: t('nav.uke'), path: '/uke', icon: <CalendarDays size={18} /> },
+        { name: t('nav.prosent'), path: '/prosent', icon: <Percent size={18} /> },
     ];
 
     return (
-        <nav className="border-b border-slate-800 bg-nordic-dark/95 backdrop-blur-md sticky top-0 z-50">
+        <nav className="border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-nordic-dark/95 backdrop-blur-md sticky top-0 z-50 transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     <Link to="/" className="flex items-center gap-2 group" onClick={() => setIsOpen(false)}>
                         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-nordic-accent to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:shadow-blue-500/25 transition-all">
                             N
                         </div>
-                        <span className="font-bold text-xl tracking-tight text-white">Nor<span className="text-nordic-accent">Tools</span></span>
+                        <span className="font-bold text-xl tracking-tight text-nordic-lightText dark:text-white transition-colors">Nor<span className="text-nordic-accent">Tools</span></span>
                     </Link>
 
                     {/* Desktop Menu */}
-                    <div className="hidden lg:block">
-                        <div className="ml-10 flex items-baseline space-x-1">
+                    <div className="hidden lg:flex items-center gap-4">
+                        <div className="flex items-baseline space-x-1">
                             {navItems.map((item) => (
                                 <Link
                                     key={item.path}
@@ -45,13 +51,19 @@ const Navbar = () => {
                                 </Link>
                             ))}
                         </div>
+                        <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+                        <div className="flex items-center gap-2">
+                            <ThemeToggler />
+                            <LanguageSwitcher />
+                        </div>
                     </div>
 
                     {/* Mobile Menu Button */}
-                    <div className="lg:hidden">
+                    <div className="lg:hidden flex items-center gap-4">
+                        <ThemeToggler />
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="p-2 text-slate-400 hover:text-white transition-colors"
+                            className="p-2 text-slate-600 dark:text-slate-400 hover:text-nordic-lightText dark:hover:text-white transition-colors"
                         >
                             {isOpen ? <X size={28} /> : <Menu size={28} />}
                         </button>
@@ -61,14 +73,18 @@ const Navbar = () => {
 
             {/* Mobile Dropdown */}
             {isOpen && (
-                <div className="lg:hidden absolute top-16 left-0 w-full bg-slate-900 border-b border-slate-800 shadow-2xl animate-fade-in-down">
+                <div className="lg:hidden absolute top-16 left-0 w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-2xl animate-fade-in-down">
+                    <div className="px-4 py-3 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
+                        <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Innstillinger</span>
+                        <LanguageSwitcher />
+                    </div>
                     <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 grid grid-cols-2 gap-2">
                         {navItems.map((item) => (
                             <Link
                                 key={item.path}
                                 to={item.path}
                                 onClick={() => setIsOpen(false)}
-                                className={`flex flex-col items-center justify-center p-4 rounded-xl border border-slate-800 ${location.pathname === item.path ? 'bg-slate-800 text-nordic-accent' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+                                className={`flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-800 ${location.pathname === item.path ? 'bg-slate-100 dark:bg-slate-800 text-nordic-accent' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-nordic-lightText dark:hover:text-white'}`}
                             >
                                 <div className="mb-2">{item.icon}</div>
                                 <span className="text-sm font-bold">{item.name}</span>
@@ -77,18 +93,18 @@ const Navbar = () => {
                         <Link
                             to="/excel-ai"
                             onClick={() => setIsOpen(false)}
-                            className={`flex flex-col items-center justify-center p-4 rounded-xl border border-slate-800 ${location.pathname === '/excel-ai' ? 'bg-slate-800 text-nordic-accent' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+                            className={`flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-800 ${location.pathname === '/excel-ai' ? 'bg-slate-100 dark:bg-slate-800 text-nordic-accent' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-nordic-lightText dark:hover:text-white'}`}
                         >
                             <div className="mb-2"><Table2 size={18} /></div>
-                            <span className="text-sm font-bold">Excel AI</span>
+                            <span className="text-sm font-bold">{t('nav.excel')}</span>
                         </Link>
                         <Link
                             to="/json-csv"
                             onClick={() => setIsOpen(false)}
-                            className={`flex flex-col items-center justify-center p-4 rounded-xl border border-slate-800 ${location.pathname === '/json-csv' ? 'bg-slate-800 text-nordic-accent' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+                            className={`flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 dark:border-slate-800 ${location.pathname === '/json-csv' ? 'bg-slate-100 dark:bg-slate-800 text-nordic-accent' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-nordic-lightText dark:hover:text-white'}`}
                         >
                             <div className="mb-2"><FileJson size={18} /></div>
-                            <span className="text-sm font-bold">JSON Dev</span>
+                            <span className="text-sm font-bold">{t('nav.json')}</span>
                         </Link>
                     </div>
                 </div>

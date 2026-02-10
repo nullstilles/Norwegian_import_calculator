@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -20,6 +21,9 @@ export default {
           text: '#f8fafc', // Slate-50
           accent: '#3b82f6', // Blue-500
           accentHover: '#2563eb', // Blue-600
+          light: '#f1f5f9', // Slate-100
+          lightCard: '#ffffff', // White
+          lightText: '#1e293b', // Slate-800
         }
       }
     },
