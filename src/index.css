@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-nordic-dark text-nordic-text font-sans antialiased min-h-screen flex flex-col;
+    @apply bg-nordic-light text-nordic-lightText dark:bg-nordic-dark dark:text-nordic-text font-sans antialiased min-h-screen flex flex-col transition-colors duration-300;
   }
 }
 
