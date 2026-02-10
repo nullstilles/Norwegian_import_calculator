@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { fetchRates } from '../utils/api';
 
 const formatCurrency = (amount) => {
     return new Intl.NumberFormat('no-NO', { style: 'currency', currency: 'NOK' }).format(amount)
@@ -6,18 +7,56 @@ const formatCurrency = (amount) => {
 
 const TollCalculator = () => {
     const [price, setPrice] = useState('')
+    const [currency, setCurrency] = useState('NOK') // NOK, USD, EUR, GBP
+    const [rates, setRates] = useState(null)
+
     const [shipping, setShipping] = useState('')
     const [category, setCategory] = useState('electronics')
     const [voec, setVoec] = useState(false)
 
+    // Fetch rates on mount
+    useEffect(() => {
+        const loadRates = async () => {
+            const { rates: fetchedRates } = await fetchRates('NOK');
+            setRates(fetchedRates);
+        }
+        loadRates();
+    }, []);
+
     const calculations = useMemo(() => {
-        const p = parseFloat(price) || 0
-        const s = parseFloat(shipping) || 0
+        let p = parseFloat(price) || 0
+        let s = parseFloat(shipping) || 0
+
+        // Convert to NOK if needed
+        let exchangeRate = 1;
+        if (currency !== 'NOK' && rates) {
+            // rates are based on NOK (1 NOK = X Foreign)
+            // Wait, fetchRates('NOK') means 1 NOK = 0.09 USD.
+            // So Price(USD) / Rate = Price(NOK).
+            // Example: 1 NOK = 0.1 USD. 10 USD / 0.1 = 100 NOK.
+
+            // Frankfurter 'Base' is the 1 unit.
+            // fetchRates('NOK') returns { USD: 0.09, ... }
+            // To go foreign -> NOK: foreign / rate.
+
+            const rate = rates[currency];
+            if (rate) {
+                exchangeRate = rate;
+                p = p / rate;
+                // Shipping is usually in same currency if buying abroad? 
+                // Let's assume user converts shipping manually or it's NOK designated in inputs?
+                // The prompt says "Price (NOK)". The new prompt says "Dropdown next to Price".
+                // Ideally shipping matches currency. Let's assume shipping is also in selected currency.
+                s = s / rate;
+            }
+        }
+
         const baseValue = p + s
 
         let tollRate = 0
         if (category === 'clothing') tollRate = 0.107
 
+        // Toll applies to Price only for clothing
         const toll = category === 'clothing' ? p * tollRate : 0
 
         let fee = 0
@@ -31,8 +70,8 @@ const TollCalculator = () => {
         const mva = 0.25 * (baseValue + toll)
         const total = baseValue + toll + mva + fee
 
-        return { baseValue, toll, mva, fee, total }
-    }, [price, shipping, category, voec])
+        return { baseValue, toll, mva, fee, total, exchangeRate, convertedPrice: p }
+    }, [price, shipping, category, voec, currency, rates])
 
     const copyResult = () => {
         const text = `Item + Shipping: ${formatCurrency(calculations.baseValue)}\nVAT & Customs: ${formatCurrency(calculations.mva + calculations.toll)}\nPosten Fee: ${formatCurrency(calculations.fee)}\nTotal: ${formatCurrency(calculations.total)}`
@@ -54,30 +93,48 @@ const TollCalculator = () => {
                     {/* Inputs */}
                     <div className="space-y-5">
                         <div className="group">
-                            <label className="block text-sm font-bold mb-2 text-slate-300 group-focus-within:text-nordic-accent transition-colors">Item Price (NOK)</label>
-                            <div className="relative">
-                                <input
-                                    type="number"
-                                    value={price}
-                                    onChange={(e) => setPrice(e.target.value)}
-                                    className="w-full px-4 py-3 pl-4 pr-12 rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-nordic-accent focus:border-transparent outline-none transition-all placeholder-slate-500"
-                                    placeholder="0"
-                                />
-                                <span className="absolute right-4 top-3.5 text-slate-500 font-medium">kr</span>
+                            <label className="block text-sm font-bold mb-2 text-slate-300 group-focus-within:text-nordic-accent transition-colors">Item Price & Currency</label>
+                            <div className="flex gap-2">
+                                <div className="relative flex-1">
+                                    <input
+                                        type="number"
+                                        value={price}
+                                        onChange={(e) => setPrice(e.target.value)}
+                                        className="w-full px-4 py-3 pl-4 rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-nordic-accent focus:border-transparent outline-none transition-all placeholder-slate-500"
+                                        placeholder="0"
+                                    />
+                                </div>
+                                <div className="w-24">
+                                    <select
+                                        value={currency}
+                                        onChange={(e) => setCurrency(e.target.value)}
+                                        className="w-full h-full px-3 rounded-xl border border-slate-700 bg-slate-800 text-white font-bold focus:ring-2 focus:ring-nordic-accent outline-none cursor-pointer"
+                                    >
+                                        <option value="NOK">NOK</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                    </select>
+                                </div>
                             </div>
+                            {currency !== 'NOK' && calculations.exchangeRate !== 1 && (
+                                <p className="text-xs text-slate-400 mt-2 ml-1">
+                                    ≈ {formatCurrency(calculations.convertedPrice)} (Kurs: {(1 / calculations.exchangeRate).toFixed(2)})
+                                </p>
+                            )}
                         </div>
 
                         <div className="group">
-                            <label className="block text-sm font-bold mb-2 text-slate-300 group-focus-within:text-nordic-accent transition-colors">Shipping Cost (NOK)</label>
+                            <label className="block text-sm font-bold mb-2 text-slate-300 group-focus-within:text-nordic-accent transition-colors">Shipping Cost</label>
                             <div className="relative">
                                 <input
                                     type="number"
                                     value={shipping}
                                     onChange={(e) => setShipping(e.target.value)}
-                                    className="w-full px-4 py-3 pl-4 pr-12 rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-nordic-accent focus:border-transparent outline-none transition-all placeholder-slate-500"
+                                    className="w-full px-4 py-3 pl-4 pr-16 rounded-xl border border-slate-700 bg-slate-800 text-white focus:ring-2 focus:ring-nordic-accent focus:border-transparent outline-none transition-all placeholder-slate-500"
                                     placeholder="0"
                                 />
-                                <span className="absolute right-4 top-3.5 text-slate-500 font-medium">kr</span>
+                                <span className="absolute right-4 top-3.5 text-slate-500 font-medium">{currency}</span>
                             </div>
                         </div>
 
@@ -133,7 +190,7 @@ const TollCalculator = () => {
                     {/* Results */}
                     <div className="space-y-4 bg-slate-800/50 p-6 rounded-xl border border-slate-700/50">
                         <div className="flex justify-between text-sm text-slate-400 items-center">
-                            <span className="font-medium">Item + Shipping</span>
+                            <span className="font-medium">Item + Shipping (NOK)</span>
                             <span className="font-bold text-white font-mono tracking-tight">{formatCurrency(calculations.baseValue)}</span>
                         </div>
                         <div className="flex justify-between text-sm text-slate-400 items-center">
