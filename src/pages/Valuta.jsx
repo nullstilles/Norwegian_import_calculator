@@ -1,34 +1,38 @@
 import { useState, useEffect } from 'react';
-import { ArrowRightLeft, ArrowDown, Banknote } from 'lucide-react';
+import { ArrowDown, Banknote, WifiOff } from 'lucide-react';
+import { fetchRates } from '../utils/api';
 
 const Valuta = () => {
     const [amount, setAmount] = useState('1');
     const [from, setFrom] = useState('USD');
     const [to, setTo] = useState('NOK');
-    const [rate, setRate] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [rates, setRates] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [source, setSource] = useState('api'); // api, cache, fallback
 
     useEffect(() => {
-        const fetchRate = async () => {
-            if (from === to) {
-                setRate(1);
-                return;
-            }
+        const loadRates = async () => {
             setLoading(true);
-            try {
-                const res = await fetch(`https://api.frankfurter.app/latest?from=${from}&to=${to}`);
-                const data = await res.json();
-                setRate(data.rates[to]);
-            } catch (error) {
-                console.error("Failed to fetch rates", error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchRate();
-    }, [from, to]);
+            const data = await fetchRates('NOK'); // Fetch all against NOK base for simplicity (Frankfurter free is Euro base usually but allows from)
+            // Wait, Frankfurter free endpoint is ?from=X.
+            // If we want to convert ANY to ANY using frankfurter without many requests:
+            // Strategy: Fetch ?from=NOK once. Then we have NOK -> USD, NOK -> EUR etc.
+            // To convert USD -> EUR: (NOK -> EUR) / (NOK -> USD) ? No, that's (1/EUR_in_NOK) * ... 
+            // Better: Fetch rates based on "from" currency when it changes.
 
-    const result = amount && rate ? (parseFloat(amount) * rate).toFixed(2) : '...';
+            // Let's stick to the implementation plan: "fetchRates(base)".
+            // BUT, if we cache "rates_NOK", and user switches to "USD", we define a new cache key in fetching function logic.
+
+            // Correct approach for this component:
+            const { rates: newRates, source: newSource } = await fetchRates(from);
+            setRates(newRates);
+            setSource(newSource);
+            setLoading(false);
+        };
+        loadRates();
+    }, [from]); // Reload when 'from' currency changes
+
+    const result = amount && rates[to] ? (parseFloat(amount) * rates[to]).toFixed(2) : '...';
 
     const currencies = ["NOK", "USD", "EUR", "GBP", "SEK", "DKK"];
 
@@ -40,13 +44,19 @@ const Valuta = () => {
     return (
         <div className="max-w-xl mx-auto px-4 py-8">
             <div className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
-                <div className="bg-slate-900 p-8 text-center text-white">
+                <div className="bg-slate-900 p-8 text-center text-white relative">
                     <div className="flex justify-center mb-4">
                         <div className="bg-emerald-500 p-3 rounded-full">
                             <Banknote size={32} className="text-white" />
                         </div>
                     </div>
                     <h1 className="text-3xl font-bold">Valuta Kalkulator</h1>
+
+                    {source === 'fallback' && (
+                        <div className="absolute top-4 right-4 bg-red-500/20 border border-red-500/50 rounded-full px-3 py-1 flex items-center gap-1 text-xs font-bold text-red-200">
+                            <WifiOff size={12} /> Offline
+                        </div>
+                    )}
                 </div>
 
                 <div className="p-8 space-y-4">
@@ -75,7 +85,8 @@ const Valuta = () => {
                     <div className="flex justify-center -my-6 z-10 relative">
                         <button
                             onClick={swap}
-                            className="bg-slate-900 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
+                            disabled={loading}
+                            className="bg-slate-900 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform disabled:opacity-50"
                         >
                             <ArrowDown size={24} />
                         </button>
@@ -94,13 +105,14 @@ const Valuta = () => {
                             </select>
                         </div>
                         <div className="w-full text-4xl font-black text-emerald-600 truncate">
-                            {loading ? <span className="text-slate-300 animate-pulse">...</span> : result}
+                            {loading ? <span className="text-slate-300 animate-pulse text-2xl">Laster kurser...</span> : result}
                         </div>
                     </div>
 
-                    {rate && (
+                    {!loading && rates[to] && (
                         <p className="text-center text-sm text-slate-400 font-medium pt-4">
-                            1 {from} = {rate} {to}
+                            1 {from} = {rates[to]} {to}
+                            {source === 'fallback' && <span className="block text-red-400 text-xs mt-1">Estimert kurs (Ingen nettverk)</span>}
                         </p>
                     )}
                 </div>
