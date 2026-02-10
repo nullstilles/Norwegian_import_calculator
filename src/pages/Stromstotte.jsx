@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Zap, RefreshCcw } from 'lucide-react';
 import { fetchElectricityPrice } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
+import SEO from '../components/SEO';
 
 const formatCurrency = (amount) => {
     return new Intl.NumberFormat('no-NO', { style: 'currency', currency: 'NOK', maximumFractionDigits: 2 }).format(amount);
@@ -49,6 +50,7 @@ const Stromstotte = () => {
 
     return (
         <div className="max-w-2xl mx-auto px-4 py-8">
+            <SEO title={t('stromCalc.title')} description={t('stromCalc.subtitle')} path="/strom" />
             <div className="bg-white dark:bg-nordic-card rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700/50 overflow-hidden">
                 <div className="bg-slate-900 dark:bg-slate-800 p-8 text-center text-white">
                     <div className="flex justify-center mb-4">

@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Sparkles, Copy, Check, Loader2 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useToast } from '../context/ToastContext';
+import SEO from '../components/SEO';
 
 const ExcelGenerator = () => {
     const { t } = useLanguage();
+    const { addToast } = useToast();
     const [prompt, setPrompt] = useState('');
     const [result, setResult] = useState('');
     const [loading, setLoading] = useState(false);
@@ -35,11 +38,13 @@ const ExcelGenerator = () => {
     const copyToClipboard = () => {
         navigator.clipboard.writeText(result);
         setCopied(true);
+        addToast(t('excelCalc.copied'), 'success');
         setTimeout(() => setCopied(false), 2000);
     };
 
     return (
         <div className="max-w-3xl mx-auto px-4 py-12">
+            <SEO title={t('excelCalc.title')} description={t('excelCalc.subtitle')} path="/excel-ai" />
             <div className="text-center mb-10">
                 <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-700 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-green-900/20 mb-4">
                     <Sparkles className="text-white w-8 h-8" />

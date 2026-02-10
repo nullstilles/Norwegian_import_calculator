@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ArrowDown, Banknote, WifiOff } from 'lucide-react';
 import { fetchRates } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
+import SEO from '../components/SEO';
 
 const Valuta = () => {
     const { t } = useLanguage();
@@ -34,6 +35,7 @@ const Valuta = () => {
 
     return (
         <div className="max-w-xl mx-auto px-4 py-8">
+            <SEO title={t('valutaCalc.title')} path="/valuta" />
             <div className="bg-white dark:bg-nordic-card rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700/50 overflow-hidden">
                 <div className="bg-slate-900 dark:bg-slate-800 p-8 text-center text-white relative">
                     <div className="flex justify-center mb-4">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CalendarDays } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import SEO from '../components/SEO';
 
 const getWeekNumber = (d) => {
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -23,6 +24,7 @@ const Ukenummer = () => {
 
     return (
         <div className="max-w-xl mx-auto px-4 py-8">
+            <SEO title={t('ukeCalc.title')} description={t('ukeCalc.subtitle')} path="/uke" />
             <div className="bg-white dark:bg-nordic-card rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700/50 overflow-hidden text-center">
                 <div className="bg-slate-900 dark:bg-slate-800 p-8">
                     <div className="inline-flex items-center justify-center p-3 bg-white/10 rounded-xl text-white mb-4">

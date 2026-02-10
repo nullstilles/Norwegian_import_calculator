@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 
 import { useLanguage } from '../context/LanguageContext';
+import SEO from '../components/SEO';
 
 const ToolCard = ({ title, description, icon, to, color, goToText }) => (
     <Link
@@ -37,6 +38,7 @@ const Home = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <SEO title={t('home.title')} description={t('home.subtitle')} />
             <div className="text-center mb-16 space-y-4">
                 <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-nordic-lightText to-slate-400 dark:from-white dark:to-slate-400 tracking-tight transition-colors">
                     {t('home.title')}

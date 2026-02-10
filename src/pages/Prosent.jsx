@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Percent } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import SEO from '../components/SEO';
 
 const Prosent = () => {
     const { t } = useLanguage();
@@ -38,6 +39,7 @@ const Prosent = () => {
 
     return (
         <div className="max-w-2xl mx-auto px-4 py-8">
+            <SEO title={t('prosentCalc.title')} path="/prosent" />
             <div className="bg-white dark:bg-nordic-card rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700/50 overflow-hidden min-h-[600px] flex flex-col">
                 <div className="bg-slate-900 dark:bg-slate-800 p-8 text-center pb-12">
                     <div className="flex justify-center mb-4">

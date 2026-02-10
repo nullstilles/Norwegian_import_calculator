@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { FileJson, FileType, ArrowRightLeft, Upload, Trash2, Copy } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useToast } from '../context/ToastContext';
+import SEO from '../components/SEO';
 
 const JsonConverter = () => {
     const { t } = useLanguage();
+    const { addToast } = useToast();
     const [jsonInput, setJsonInput] = useState('');
     const [csvOutput, setCsvOutput] = useState('');
     const [error, setError] = useState('');
@@ -88,11 +91,14 @@ const JsonConverter = () => {
     }
 
     const copyToClipboard = (text) => {
+        if (!text) return;
         navigator.clipboard.writeText(text);
+        addToast(t('jsonCalc.copy') + '!', 'success');
     };
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8 h-[calc(100vh-8rem)] flex flex-col">
+            <SEO title={t('jsonCalc.title')} path="/json-csv" />
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-white flex items-center gap-2">
                     <FileJson className="text-nordic-accent" /> {t('jsonCalc.title')}

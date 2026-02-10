@@ -13,30 +13,36 @@ import Valuta from './pages/Valuta';
 
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { ToastProvider } from './context/ToastContext';
+import { HelmetProvider } from 'react-helmet-async';
 
 function App() {
   return (
     <LanguageProvider>
       <ThemeProvider>
-        <Router>
-          <div className="flex flex-col min-h-screen bg-nordic-light dark:bg-nordic-dark text-nordic-lightText dark:text-nordic-text transition-colors duration-300">
-            <Navbar />
-            <main className="flex-grow">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/toll" element={<TollCalculator />} />
-                <Route path="/json-csv" element={<JsonConverter />} />
-                <Route path="/excel-ai" element={<ExcelGenerator />} />
-                <Route path="/strom" element={<Stromstotte />} />
-                <Route path="/bilavgift" element={<Bilavgift />} />
-                <Route path="/prosent" element={<Prosent />} />
-                <Route path="/uke" element={<Ukenummer />} />
-                <Route path="/valuta" element={<Valuta />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </Router>
+        <ToastProvider>
+          <HelmetProvider>
+            <Router>
+              <div className="flex flex-col min-h-screen bg-nordic-light dark:bg-nordic-dark text-nordic-lightText dark:text-nordic-text transition-colors duration-300">
+                <Navbar />
+                <main className="flex-grow">
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/toll" element={<TollCalculator />} />
+                    <Route path="/json-csv" element={<JsonConverter />} />
+                    <Route path="/excel-ai" element={<ExcelGenerator />} />
+                    <Route path="/strom" element={<Stromstotte />} />
+                    <Route path="/bilavgift" element={<Bilavgift />} />
+                    <Route path="/prosent" element={<Prosent />} />
+                    <Route path="/uke" element={<Ukenummer />} />
+                    <Route path="/valuta" element={<Valuta />} />
+                  </Routes>
+                </main>
+                <Footer />
+              </div>
+            </Router>
+          </HelmetProvider>
+        </ToastProvider>
       </ThemeProvider>
     </LanguageProvider>
   );

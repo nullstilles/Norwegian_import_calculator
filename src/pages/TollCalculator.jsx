@@ -1,6 +1,9 @@
 import { useState, useMemo, useEffect } from 'react'
 import { fetchRates } from '../utils/api';
 import { useLanguage } from '../context/LanguageContext';
+import { useToast } from '../context/ToastContext';
+import useLocalStorage from '../hooks/useLocalStorage';
+import SEO from '../components/SEO';
 
 const formatCurrency = (amount) => {
     return new Intl.NumberFormat('no-NO', { style: 'currency', currency: 'NOK' }).format(amount)
@@ -8,13 +11,14 @@ const formatCurrency = (amount) => {
 
 const TollCalculator = () => {
     const { t } = useLanguage();
-    const [price, setPrice] = useState('')
-    const [currency, setCurrency] = useState('NOK') // NOK, USD, EUR, GBP
+    const { addToast } = useToast();
+    const [price, setPrice] = useLocalStorage('toll_price', '')
+    const [currency, setCurrency] = useLocalStorage('toll_currency', 'NOK') // NOK, USD, EUR, GBP
     const [rates, setRates] = useState(null)
 
-    const [shipping, setShipping] = useState('')
-    const [category, setCategory] = useState('electronics')
-    const [voec, setVoec] = useState(false)
+    const [shipping, setShipping] = useLocalStorage('toll_shipping', '')
+    const [category, setCategory] = useLocalStorage('toll_category', 'electronics')
+    const [voec, setVoec] = useLocalStorage('toll_voec', false)
 
     // Fetch rates on mount
     useEffect(() => {
@@ -65,11 +69,12 @@ const TollCalculator = () => {
     const copyResult = () => {
         const text = `${t('tollCalc.results.itemShipping')}: ${formatCurrency(calculations.baseValue)}\n${t('tollCalc.results.vatCustoms')}: ${formatCurrency(calculations.mva + calculations.toll)}\n${t('tollCalc.results.fee')}: ${formatCurrency(calculations.fee)}\n${t('tollCalc.results.total')}: ${formatCurrency(calculations.total)}`
         navigator.clipboard.writeText(text)
-        alert(t('tollCalc.copyAlert'))
+        addToast(t('tollCalc.copyAlert'), 'success');
     }
 
     return (
         <div className="max-w-2xl mx-auto py-12 px-4">
+            <SEO title={t('tollCalc.title')} description={t('tollCalc.subtitle')} path="/toll" />
             <div className="bg-white dark:bg-nordic-card rounded-2xl border border-slate-200 dark:border-slate-700/50 shadow-xl overflow-hidden">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-norwegian-blue to-blue-900 p-8 text-center relative">
